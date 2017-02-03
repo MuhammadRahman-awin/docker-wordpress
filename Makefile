@@ -2,11 +2,14 @@ all: build start
 
 build: build-wordpress
 
+build-php:
+	docker build -t docker-php -f Docker/php/Dockerfile .
+
 build-wordpress:
-	docker build -t docker-wordpress -f wordpress/Dockerfile .
+	docker build -t docker-wordpress -f Docker/wordpress/Dockerfile .
 
 rsync:
-	rsync -e "docker exec -i" --blocking-io -avz --delete --exclude=".git" . docker-wordpress:/var/www/html/wp-content/plugins/awin-data-feed
+	rsync -e "docker exec -i" --blocking-io -avz --delete --exclude=".git" . docker-wordpress:/var/www/html/wp-content/plugins/
 
 start: stop
 	docker run --name wpmysql -e MYSQL_ROOT_PASSWORD=secret -d mysql:latest
