@@ -12,8 +12,18 @@ rsync:
 	rsync -e "docker exec -i" --blocking-io -avz --delete --exclude=".git" . docker-wordpress:/var/www/html/wp-content/plugins/
 
 start: stop
-	docker run --name wpmysql -e MYSQL_ROOT_PASSWORD=secret -d mysql:latest
-	docker run --name docker-wordpress --link wpmysql:mysql -p 8080:80 -d docker-wordpress
+	docker run \
+        --name wpmysql \
+        -p 3333:3306 \
+        --volume=/data/mysql:/var/lib/mysql \
+        -e MYSQL_ROOT_PASSWORD=secret \
+        -d mysql:latest
+
+	docker run \
+        --name docker-wordpress \
+        --link wpmysql:mysql \
+        -p 8080:80 \
+        -d docker-wordpress
 
 stop:
 	@docker rm -vf wpmysql docker-wordpress||:
